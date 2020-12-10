@@ -66,8 +66,8 @@ def get_index(x, p):
       return i
   return len(p)
 
-def draw_pic():
-
+def draw_pic(root_path):
+  os.chdir(root_path)
   fig = plt.figure(figsize=(45, 15))
   global speed_in, message
 
@@ -79,7 +79,6 @@ def draw_pic():
   now_num = 0
   for index in range(len(speed_in)):
     if len(speed_in[index]) > 0 and sum(speed_in[index]) > 0:
-      print(speed_in[index])
       ax1 = fig.add_subplot(2, (pic_num + 1) / 2, now_num)
       now_num += 1
       #设置标题
@@ -93,12 +92,12 @@ def draw_pic():
         y.append(0)
       ax1.scatter(speed_in[index], y, c = 'r')
       #设置图标
-  plt.show()
+  plt.savefig('速率分布.jpg')
+  for i in range(len(speed_in)):
+      speed_in[i] = []
 
 def get_meaasge(root_path, file_path):
-  print(file_path)
   os.chdir(root_path)
-  print(os.getcwd())
   num = [0] * 30    # 每个阶段出现的次数
   avg = [0.0] * 30  # 每次执行的传输速率
   time = [0] * 30   # 每次执行所用时间
@@ -155,7 +154,9 @@ def get_file_path(root_path):
         get_message_and_pic(root_path, dir_file_path)
 
 def get_message_and_pic(root_path, file_path):
+  print(file_path)
   get_meaasge(root_path, file_path)
+  draw_pic(root_path)
 
 if __name__ == "__main__":
   get_file_path("/Users/huyutuo/Desktop/github/horovod-test-data")
