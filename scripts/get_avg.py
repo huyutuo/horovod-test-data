@@ -168,6 +168,7 @@ def get_message_and_pic(root_path, file_path):
         is_solve = True
         break
   if is_solve == False: 
+    print("solve " + file_path)
     get_meaasge(root_path, file_path)
     draw_pic(root_path)
 
