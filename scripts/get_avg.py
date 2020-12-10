@@ -68,14 +68,18 @@ def get_index(x, p):
 
 def draw_pic(root_path):
   os.chdir(root_path)
-  fig = plt.figure(figsize=(15, 15))
   global speed_in, message
+  
 
   pic_num = 0
   for speed in speed_in:
     if len(speed) > 0 and sum(speed) > 0:
       pic_num += 1
   
+  if pic_num == 0:
+    return
+  fig = plt.figure(figsize=(pic_num * 4, 16))
+
   now_num = 0
   for index in range(len(speed_in)):
     if len(speed_in[index]) > 0 and sum(speed_in[index]) > 0:
