@@ -58,7 +58,7 @@ message = { 0 : "4Byte",
 
 speed_in = [[] for j in range(30)] # 每个阶段所有的传输速率，用来画速率分布图
 
-all_message_fout = open("/Users/huyutuo/Desktop/github/horovod-test-data/all_message.md", 'wt')
+all_message_fout = open("/Users/huyutuo/Desktop/github/horovod-test-data/all_message.md", 'a')
 
 def get_index(x, p):
   for i in range(len(p)):
@@ -130,12 +130,15 @@ def get_meaasge(root_path, file_path):
 
   f = open("README.md", 'wt')
   print >> all_message_fout, file_path.split("/")[-1]
+  print >> all_message_fout, "|   |个数|速率|时间|时间占比|\n|---|---|---|---|---|"
+  print >> f, "|   |个数|速率/Mbps|时间/s|时间占比|\n|---|---|---|---|---|"
   for i in range(0, 21):
     if num[i] > 0 :
-      mtmp = ("%s总个数: %d,  速率平均值: %.2fMbps,  时间共: %.2fs, 百分比: %.2f%%" %
+      mtmp = ("|%s|%d|%.2f|%.2f|%.2f%%|" %
              (message[i], num[i], avg[i]/num[i], time[i]*1.0/1000, 100.0*time[i]/all_time))
       print >> f, mtmp
       print >> all_message_fout, mtmp
+  print >> f, "\n![](./速率分布.jpg)"
   print >> all_message_fout, "\n\n\n"
   f.close
 
@@ -154,9 +157,15 @@ def get_file_path(root_path):
         get_message_and_pic(root_path, dir_file_path)
 
 def get_message_and_pic(root_path, file_path):
-  print(file_path)
-  get_meaasge(root_path, file_path)
-  draw_pic(root_path)
+  is_solve = False
+  dir_or_files = os.listdir(root_path)
+  for dir_file in dir_or_files:
+      if dir_file.find("速率分布") != -1:
+        is_solve = True
+        break
+  if is_solve == False: 
+    get_meaasge(root_path, file_path)
+    draw_pic(root_path)
 
 if __name__ == "__main__":
   get_file_path("/Users/huyutuo/Desktop/github/horovod-test-data")
