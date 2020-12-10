@@ -54,12 +54,11 @@ message = { 0 : "4Byte",
             20 : "(450MB, 500MB]",
             21 : "(500MB, ...)" }
 
-num = [0] * 30    # 每个阶段出现的次数
-avg = [0.0] * 30  # 每次执行的传输速率
-time = [0] * 30   # 每次执行所用时间
-all_time = 0      # 所有执行所用的时间
+
 
 speed_in = [[] for j in range(30)] # 每个阶段所有的传输速率，用来画速率分布图
+
+all_message_fout = open("/Users/huyutuo/Desktop/github/horovod-test-data/all_message.md", 'wt')
 
 def get_index(x, p):
   for i in range(len(p)):
@@ -96,12 +95,15 @@ def draw_pic():
       #设置图标
   plt.show()
 
-def get_avg():
-  global all_time
-  #f = open("/Users/huyutuo/Downloads/12-08-test-rank_0")
-  #f = open("/Users/huyutuo/Downloads/12-08-19-test-resnet50-rank_0")
-  #f = open("/Users/huyutuo/Downloads/12-09-09-vgg16-fusion128-cycle20-rank_0")
-  f = open("/Users/huyutuo/Downloads/12-09-14-resnet50-fusion128-cycle20-rank_0")
+def get_meaasge(root_path, file_path):
+  print(file_path)
+  os.chdir(root_path)
+  print(os.getcwd())
+  num = [0] * 30    # 每个阶段出现的次数
+  avg = [0.0] * 30  # 每次执行的传输速率
+  time = [0] * 30   # 每次执行所用时间
+  all_time = 0      # 所有执行所用的时间
+  f = open(file_path)
   
   line = f.readline()
   while line:
@@ -125,10 +127,19 @@ def get_avg():
       time[index] += t
       all_time += t
     line = f.readline()
+  f.close()
+
+  f = open("README.md", 'wt')
+  print >> all_message_fout, file_path.split("/")[-1]
   for i in range(0, 21):
     if num[i] > 0 :
-      print ("%s总个数为: %d,   传输速率平均值为: %.2fMbps,  传输时间总共为%.2fs, 传输所占时间百分为%.2f%%" % (message[i], num[i], avg[i]/num[i], time[i]*1.0/1000, 100.0*time[i]/all_time))
-  f.close()
+      mtmp = ("%s总个数: %d,  速率平均值: %.2fMbps,  时间共: %.2fs, 百分比: %.2f%%" %
+             (message[i], num[i], avg[i]/num[i], time[i]*1.0/1000, 100.0*time[i]/all_time))
+      print >> f, mtmp
+      print >> all_message_fout, mtmp
+  print >> all_message_fout, "\n\n\n"
+  f.close
+
 
 def get_file_path(root_path):
   #print(root_path)
@@ -140,11 +151,11 @@ def get_file_path(root_path):
     if os.path.isdir(dir_file_path):
         get_file_path(dir_file_path)
     else:
-      if dir_file_path.find("-rank_0") != -1:
-        print(os.getcwd())
-        os.chdir(root_path)
-        print(os.getcwd())
-        print(root_path)
-        print(dir_file_path)
+      if dir_file_path.find("rank_0") != -1:
+        get_message_and_pic(root_path, dir_file_path)
+
+def get_message_and_pic(root_path, file_path):
+  get_meaasge(root_path, file_path)
+
 if __name__ == "__main__":
   get_file_path("/Users/huyutuo/Desktop/github/horovod-test-data")
