@@ -68,7 +68,7 @@ def get_index(x, p):
 
 def draw_pic(root_path):
   os.chdir(root_path)
-  fig = plt.figure(figsize=(45, 15))
+  fig = plt.figure(figsize=(15, 15))
   global speed_in, message
 
   pic_num = 0
@@ -163,9 +163,9 @@ def get_message_and_pic(root_path, file_path):
       if dir_file.find("速率分布") != -1:
         is_solve = True
         break
-  if is_solve == False: 
-    get_meaasge(root_path, file_path)
-    draw_pic(root_path)
+  #if is_solve == False: 
+  get_meaasge(root_path, file_path)
+  draw_pic(root_path)
 
 if __name__ == "__main__":
   get_file_path("/Users/huyutuo/Desktop/github/horovod-test-data")
