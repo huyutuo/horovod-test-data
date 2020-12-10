@@ -167,9 +167,9 @@ def get_message_and_pic(root_path, file_path):
       if dir_file.find("速率分布") != -1:
         is_solve = True
         break
-  #if is_solve == False: 
-  get_meaasge(root_path, file_path)
-  draw_pic(root_path)
+  if is_solve == False: 
+    get_meaasge(root_path, file_path)
+    draw_pic(root_path)
 
 if __name__ == "__main__":
   get_file_path("/Users/huyutuo/Desktop/github/horovod-test-data")
