@@ -5,34 +5,11 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-# num[0] respnse大小为4Byte，(这种情况比较特殊，传输时间为0ms, 数据量很小, 不计算此传输速度的平均值)
-# num[1] respnse大小为(4Byte, 1KB]
-# num[2] respnse大小为(1KB, 1MB]
-# num[3] respnse大小为(1MB, 10MB]
-# num[4] respnse大小为(10MB, 20MB]
-# num[5] respnse大小为(20MB, 30MB]
-# num[6] respnse大小为(30MB, 40MB]
-# num[7] respnse大小为(40MB, 50MB]
-# num[8] respnse大小为(50MB, 60MB]
-# num[9] respnse大小为(60MB, 70MB]
-# num[10] respnse大小为(70MB, 80MB]
-# num[11] respnse大小为(80MB, 90MB]
-# num[12】 respnse大小为(90MB, 100MB]
-# num[13] respnse大小为(100MB, 150MB]
-# num[14] respnse大小为(150MB, 200MB]
-# num[15] respnse大小为(200MB, 250MB]
-# num[16] respnse大小为(250MB, 300MB]
-# num[17] respnse大小为(300MB, 350MB]
-# num[18] respnse大小为(350MB, 400MB]
-# num[19] respnse大小为(400MB, 450MB]
-# num[20] respnse大小为(450MB, 500MB]
-# num[21] respnse大小为(500MB, ...)
+index_num = [0, 0.001, 1, 10, 20, 30, 40, 50, 60, 70, 80, 90,
+             100, 150, 200, 250, 300, 350, 400, 450, 500]
 
-index_num = [4, 1e3, 1e6, 1e7, 2*1e7, 3*1e7, 4*1e7, 5*1e7, 6*1e7, 7*1e7, 8*1e7, 9*1e7,
-             1e8, 1e8+5*1e7, 2e8, 2e8+5*1e7, 3e8, 3e8+5*1e7, 4e8, 4e8+5*1e7, 5e8]
-
-message = { 0 : "4Byte",
-            1 : "(4Byte, 1KB]",
+message = { 
+            1 : "(0, 1KB]",
             2 : "(1KB, 1MB]",
             3 : "(1MB, 10MB]",
             4 : "(10MB, 20MB]",
@@ -62,7 +39,7 @@ all_message_fout = open("/Users/huyutuo/Desktop/github/horovod-test-data/all_mes
 
 def get_index(x, p):
   for i in range(len(p)):
-    if x*4 <= p[i]:
+    if x <= p[i]:
       return i
   return len(p)
 
@@ -110,20 +87,21 @@ def get_meaasge(root_path, file_path):
   
   line = f.readline()
   while line:
-    if line.find("执行ALLREDUCE耗时") != -1 :
+    if line.find("执行NCCL_ALLREDUCE耗时") != -1 :
       data = line.split(",")
       v = 0
       s = 0.0
       t = 0
       for i in data :
         if i.find("total size:") != -1:
-          v = int(i.split(":")[1])
+          v = float(i.split(":")[1][:-2])
         elif i.find("avg") != -1:
-          s = float(i.split(":")[1].split(" ")[0])
+          s = float(i.split(":")[1].strip("\n")[:-5])
         elif i.find("耗时") != -1:
-          tmps = i.split(":")[1].strip("\n")
-          t = int(tmps[:-2])
+          tmps = i.replace("执行NCCL_ALLREDUCE耗时","").strip("\n")
+          t = float(tmps[:-2])
       index = get_index(v, index_num)
+      
       speed_in[index].append(s)
       num[index] += 1
       avg[index] += s
@@ -132,11 +110,12 @@ def get_meaasge(root_path, file_path):
     line = f.readline()
   f.close()
 
+  print all_time
   f = open("README.md", 'wt')
   print >> all_message_fout, file_path.split("/")[-1]
   print >> all_message_fout, "|   |个数|速率|时间|时间占比|\n|---|---|---|---|---|"
   print >> f, "|   |个数|速率/Mbps|时间/s|时间占比|\n|---|---|---|---|---|"
-  for i in range(0, 21):
+  for i in range(0, 30):
     if num[i] > 0 :
       mtmp = ("|%s|%d|%.2f|%.2f|%.2f%%|" %
              (message[i], num[i], avg[i]/num[i], time[i]*1.0/1000, 100.0*time[i]/all_time))

@@ -15243,7 +15243,7 @@
 [1,0]<stdout>:[2020-12-15 19:16:07.489047: T ] iietest: RunLoopOnce sleep 19ms
 [1,0]<stdout>:[2020-12-15 19:16:07.489099: T ] iietest: num of request hit cache:0, cache invalid:0
 [1,0]<stdout>:[2020-12-15 19:16:07.489165: T ] iietest: size in entries 5775616
-[1,0]<stdout>:[2020-12-15 19:16:07.489181: T ] iietest: ResponseCache同步，耗时：0ms[2020-12-15 19:16:07.489185: T ] iietest: Processing 70 tensors, total size:8.26208MB, 执行NCCL_ALLREDUCE耗时7.057ms, avg: 9366.12Mbps.
+[1,0]<stdout>:[2020-12-15 19:16:07.489181: T ] iietest: Processing 70 tensors, total size:8.26208MB, 执行NCCL_ALLREDUCE耗时7.057ms, avg: 9366.12Mbps.
 [1,0]<stdout>:[2020-12-15 19:16:07.489211: T ] iietest:ComputeResponseList耗时：0ms
 [1,0]<stdout>:[2020-12-15 19:16:07.489223: T ] iietest: 执行所有PerformOperation耗时：0ms。 一次循环(执行一次RunLoopOnce)耗时：0ms
 [1,0]<stdout>:[2020-12-15 19:16:07.509176: T ] iietest: RunLoopOnce sleep 19ms
