@@ -2,8 +2,8 @@
 import os
 import matplotlib.pyplot as plt
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
+import time
+import re
 
 index_num = [0, 0.001, 1, 10, 20, 30, 40, 50, 60, 70, 80, 90,
              100, 150, 200, 250, 300, 350, 400, 450, 500]
@@ -35,11 +35,16 @@ message = {
 
 speed_in = [[] for j in range(30)] # 每个阶段所有的传输速率，用来画速率分布图
 
-all_message_fout = open("/Users/huyutuo/Desktop/github/horovod-test-data/all_message.md", 'a')
+
+script_path = os.getcwd()
+data_path = os.path.dirname(script_path)
+all_message_file_path = os.path.join(data_path, "all_message.md")
+print(all_message_file_path)
+all_message_fout = open(all_message_file_path, 'wt')
 
 def get_index(x, p):
   for i in range(len(p)):
-    if x <= p[i]:
+    if x/1.5 <= p[i]:
       return i
   return len(p)
 
@@ -100,9 +105,7 @@ def get_meaasge(root_path, file_path):
         elif i.find("耗时") != -1:
           tmps = i.replace("执行NCCL_ALLREDUCE耗时","").strip("\n")
           t = float(tmps[:-2])
-      index = get_index(v, index_num)
-      print v, index
-      
+      index = get_index(v, index_num) 
       speed_in[index].append(s)
       num[index] += 1
       avg[index] += s
@@ -110,20 +113,18 @@ def get_meaasge(root_path, file_path):
       all_time += t
     line = f.readline()
   f.close()
-
-  print all_time
   f = open("README.md", 'wt')
-  print >> all_message_fout, file_path.split("/")[-1]
-  print >> all_message_fout, "|   |个数|速率|时间|时间占比|\n|---|---|---|---|---|"
-  print >> f, "|   |个数|速率/Mbps|时间/s|时间占比|\n|---|---|---|---|---|"
+  print(file_path.split("/")[-1], file=all_message_fout)
+  print("|   |个数|速率|时间|时间占比|\n|---|---|---|---|---|", file=all_message_fout)
+  print("|   |个数|速率/Mbps|时间/s|时间占比|\n|---|---|---|---|---|", file=f)
   for i in range(0, 30):
     if num[i] > 0 :
       mtmp = ("|%s|%d|%.2f|%.2f|%.2f%%|" %
              (message[i], num[i], avg[i]/num[i], time[i]*1.0/1000, 100.0*time[i]/all_time))
-      print >> f, mtmp
-      print >> all_message_fout, mtmp
-  print >> f, "\n![](./速率分布.jpg)"
-  print >> all_message_fout, "\n\n\n"
+      print(mtmp, file=f)
+      print(mtmp, file=all_message_fout)
+  print("\n![](./速率分布.jpg)", file=f)
+  print("\n\n\n", file=all_message_fout)
   f.close
 
 
@@ -147,10 +148,54 @@ def get_message_and_pic(root_path, file_path):
       if dir_file.find("速率分布") != -1:
         is_solve = True
         break
-  if is_solve == True: 
-    print("solve " + file_path)
-    get_meaasge(root_path, file_path)
-   # draw_pic(root_path)
+  #if is_solve == True: 
+  print("solve " + file_path)
+  get_meaasge(root_path, file_path)
+    #draw_pic(root_path)
+
+def run_train():
+  year_dir = time.strftime("%y-%m-%d", time.localtime())
+  file_name_str = time.strftime("%m-%d-%H", time.localtime())
+  
+  year_dir = os.path.join("/root/hyt/horovod-test-data", year_dir)
+  if not os.path.exists(year_dir):
+    os.makedirs(year_dir)
+
+  command = "horovodrun -np 4 -H localhost:1,172.26.89.134:1,172.26.89.136:1,172.26.89.137:1 --log-level TRACE  "
+  train_file_path = "/root/hyt/train_file.txt"
+  f = open(train_file_path)
+  line = f.readline()
+  while line:
+    # 合成路径名以及文件名
+    all_data = re.split(r"[ ]+", line)
+    all_data[-1] = file_name_str + '-' + all_data[-1].strip(" ").strip("\n")
+
+    # 创建第二层文件夹
+    file_dir = os.path.join(year_dir, all_data[-1])
+    if not os.path.exists(file_dir):
+      os.makedirs(file_dir)
+
+    # 合成执行训练命令
+    os.chdir("/root/hyt/dis-train")
+    run_command = command + " ".join(all_data[:-1]) + " > " 
+    run_command = run_command + os.path.join(file_dir, all_data[-1])
+    print(run_command)
+    os.system(run_command)
+
+    # 提取rank0
+    os.chdir(file_dir)
+    cat_command_1 = "cat " + all_data[-1] + " | grep -F \"iietest\" > allrank"
+    cat_command_2 = "cat allrank | grep -F \"[1,0]\" > " + all_data[-1] + "_rank_0"
+    rm_command_1 = "rm allrank"
+    rm_command_2 = "rm " + all_data[-1]
+    os.system(cat_command_1)
+    os.system(cat_command_2)
+    os.system(rm_command_1)
+    os.system(rm_command_2)
+
+    # 下一行
+    line = f.readline()
 
 if __name__ == "__main__":
-  get_file_path("/Users/huyutuo/Desktop/github/horovod-test-data")
+  run_train()
+  get_file_path(data_path)
