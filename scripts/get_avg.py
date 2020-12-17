@@ -101,6 +101,7 @@ def get_meaasge(root_path, file_path):
           tmps = i.replace("执行NCCL_ALLREDUCE耗时","").strip("\n")
           t = float(tmps[:-2])
       index = get_index(v, index_num)
+      print v, index
       
       speed_in[index].append(s)
       num[index] += 1
@@ -146,10 +147,10 @@ def get_message_and_pic(root_path, file_path):
       if dir_file.find("速率分布") != -1:
         is_solve = True
         break
-  if is_solve == False: 
+  if is_solve == True: 
     print("solve " + file_path)
     get_meaasge(root_path, file_path)
-    draw_pic(root_path)
+   # draw_pic(root_path)
 
 if __name__ == "__main__":
   get_file_path("/Users/huyutuo/Desktop/github/horovod-test-data")
