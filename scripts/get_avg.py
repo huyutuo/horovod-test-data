@@ -62,7 +62,7 @@ def draw_pic(root_path):
     return
   fig = plt.figure(figsize=(pic_num * 4, 16))
 
-  now_num = 0
+  now_num = 1
   for index in range(len(speed_in)):
     if len(speed_in[index]) > 0 and sum(speed_in[index]) > 0:
       ax1 = fig.add_subplot(2, (pic_num + 1) / 2, now_num)
@@ -151,7 +151,7 @@ def get_message_and_pic(root_path, file_path):
   #if is_solve == True: 
   print("solve " + file_path)
   get_meaasge(root_path, file_path)
-    #draw_pic(root_path)
+  draw_pic(root_path)
 
 def run_train():
   year_dir = time.strftime("%y-%m-%d", time.localtime())
@@ -197,5 +197,5 @@ def run_train():
     line = f.readline()
 
 if __name__ == "__main__":
-  run_train()
+  #run_train()
   get_file_path(data_path)
