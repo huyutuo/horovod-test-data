@@ -5,7 +5,7 @@ import sys
 import time
 import re
 
-index_num = [0, 0.001, 1, 10, 20, 30, 40, 50, 60, 70, 80, 90,
+index_num = [-1, 0.001, 1, 10, 20, 30, 40, 50, 60, 70, 80, 90,
              100, 150, 200, 250, 300, 350, 400, 450, 500]
 
 message = { 
@@ -200,5 +200,5 @@ def run_train():
     line = f.readline()
 
 if __name__ == "__main__":
-  run_train()
+  #run_train()
   get_file_path(data_path)
