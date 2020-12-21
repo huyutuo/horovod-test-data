@@ -85,6 +85,7 @@ def draw_pic(root_path):
 def get_meaasge(root_path, file_path):
   os.chdir(root_path)
   num = [0] * 30    # 每个阶段出现的次数
+  data_size = [0.0] * 30 #每个阶段传输的总数据大小
   avg = [0.0] * 30  # 每次执行的传输速率
   time = [0] * 30   # 每次执行所用时间
   all_time = 0      # 所有执行所用的时间
@@ -106,6 +107,8 @@ def get_meaasge(root_path, file_path):
           tmps = i.replace("执行NCCL_ALLREDUCE耗时","").strip("\n")
           t = float(tmps[:-2])
       index = get_index(v, index_num) 
+      #print(v, message[index])
+      data_size[index] += v
       speed_in[index].append(s)
       num[index] += 1
       avg[index] += s
@@ -115,12 +118,12 @@ def get_meaasge(root_path, file_path):
   f.close()
   f = open("README.md", 'wt')
   print(file_path.split("/")[-1], file=all_message_fout)
-  print("|   |个数|速率|时间|时间占比|\n|---|---|---|---|---|", file=all_message_fout)
-  print("|   |个数|速率/Mbps|时间/s|时间占比|\n|---|---|---|---|---|", file=f)
+  print("|   |个数|平均大小/MB|速率/Mbps|总时间/s|平均时间/ms|时间占比|\n|---|---|---|---|---|---|---|", file=all_message_fout)
+  print("|   |个数|平均大小/MB|速率/Mbps|总时间/s|平均时间/ms|时间占比|\n|---|---|---|---|---|---|---|", file=f)
   for i in range(0, 30):
     if num[i] > 0 :
-      mtmp = ("|%s|%d|%.2f|%.2f|%.2f%%|" %
-             (message[i], num[i], avg[i]/num[i], time[i]*1.0/1000, 100.0*time[i]/all_time))
+      mtmp = ("|%s|%d|%.2f|%.2f|%.2f|%.2f|%.2f%%|" %
+             (message[i], num[i], data_size[i]/num[i]/1.5, avg[i]/num[i], time[i]*1.0/1000, time[i]/num[i], 100.0*time[i]/all_time))
       print(mtmp, file=f)
       print(mtmp, file=all_message_fout)
   print("\n![](./速率分布.jpg)", file=f)
@@ -151,7 +154,7 @@ def get_message_and_pic(root_path, file_path):
   #if is_solve == True: 
   print("solve " + file_path)
   get_meaasge(root_path, file_path)
-  draw_pic(root_path)
+  #draw_pic(root_path)
 
 def run_train():
   year_dir = time.strftime("%y-%m-%d", time.localtime())
