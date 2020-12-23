@@ -134,6 +134,7 @@ def get_meaasge(root_path, file_path):
 def get_file_path(root_path):
   #print(root_path)
   dir_or_files = os.listdir(root_path)
+  dir_or_files.sort()
   for dir_file in dir_or_files:
     if dir_file == ".git" or dir_file == "scripts":
       continue
