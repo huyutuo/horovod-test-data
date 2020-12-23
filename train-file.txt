@@ -1,0 +1,4 @@
+python vgg16-dis-train.py --epochs 10  vgg16
+--cycle-time-ms 20 --fusion-threshold-mb 256  python vgg16-dis-train.py  --epochs 10  vgg16-fusion128-cycle20
+python resnet50-dis-train.py --epochs 10 resnet50
+--cycle-time-ms 20 --fusion-threshold-mb 256 python resnet50-dis-train.py --epochs 10 resnet50-fusion128-cycle20
