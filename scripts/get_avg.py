@@ -164,7 +164,7 @@ def run_train():
   if not os.path.exists(year_dir):
     os.makedirs(year_dir)
 
-  command = "horovodrun -np 4 -H localhost:1,172.26.89.134:1,172.26.89.136:1,172.26.89.137:1 --log-level TRACE  "
+  command = "horovodrun -np 4 -H "
   train_file_path = "/root/hyt/train_file.txt"
   f = open(train_file_path)
   line = f.readline()
@@ -200,5 +200,5 @@ def run_train():
     line = f.readline()
 
 if __name__ == "__main__":
-  #run_train()
+  run_train()
   get_file_path(data_path)
