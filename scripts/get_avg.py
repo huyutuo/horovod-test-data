@@ -202,5 +202,5 @@ def run_train():
     line = f.readline()
 
 if __name__ == "__main__":
-  #run_train()
+  run_train()
   get_file_path(data_path)
