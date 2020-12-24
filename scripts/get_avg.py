@@ -152,10 +152,11 @@ def get_message_and_pic(root_path, file_path):
       if dir_file.find("速率分布") != -1:
         is_solve = True
         break
-  #if is_solve == True: 
+  
   print("solve " + file_path)
   get_meaasge(root_path, file_path)
-  draw_pic(root_path)
+  if is_solve == False: 
+    draw_pic(root_path)
 
 def run_train():
   year_dir = time.strftime("%y-%m-%d", time.localtime())
@@ -201,5 +202,5 @@ def run_train():
     line = f.readline()
 
 if __name__ == "__main__":
-  run_train()
+  #run_train()
   get_file_path(data_path)
