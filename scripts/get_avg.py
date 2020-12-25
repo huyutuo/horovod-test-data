@@ -98,14 +98,18 @@ def get_meaasge(root_path, file_path):
       v = 0
       s = 0.0
       t = 0
-      for i in data :
-        if i.find("total size:") != -1:
-          v = float(i.split(":")[1][:-2])
-        elif i.find("avg") != -1:
-          s = float(i.split(":")[1].strip("\n")[:-5])
-        elif i.find("耗时") != -1:
-          tmps = i.replace("执行NCCL_ALLREDUCE耗时","").strip("\n")
-          t = float(tmps[:-2])
+      try:
+        for i in data :
+          if i.find("total size:") != -1:
+            v = float(i.split(":")[1][:-2])
+          elif i.find("avg") != -1:
+            s = float(i.split(":")[1].strip("\n")[:-5])
+          elif i.find("耗时") != -1:
+            tmps = i.replace("执行NCCL_ALLREDUCE耗时","").strip("\n")
+            t = float(tmps[:-2])
+      except:
+        line = f.readline()
+        continue
       index = get_index(v, index_num) 
       #print(v, message[index])
       data_size[index] += v
@@ -202,5 +206,5 @@ def run_train():
     line = f.readline()
 
 if __name__ == "__main__":
-  run_train()
+  #run_train()
   get_file_path(data_path)
