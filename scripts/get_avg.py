@@ -89,9 +89,11 @@ def get_meaasge(root_path, file_path):
   avg = [0.0] * 30  # 每次执行的传输速率
   time = [0] * 30   # 每次执行所用时间
   all_time = 0      # 所有执行所用的时间
+  error_count = 0
   f = open(file_path)
   
   line = f.readline()
+  
   while line:
     if line.find("执行NCCL_ALLREDUCE耗时") != -1 :
       data = line.split(",")
@@ -109,6 +111,7 @@ def get_meaasge(root_path, file_path):
             t = float(tmps[:-2])
       except:
         line = f.readline()
+        error_count += 1
         continue
       index = get_index(v, index_num) 
       #print(v, message[index])
@@ -133,6 +136,7 @@ def get_meaasge(root_path, file_path):
   print("\n![](./速率分布.jpg)", file=f)
   print("\n\n\n", file=all_message_fout)
   f.close
+  print("error_count: ", error_count)
 
 
 def get_file_path(root_path):
