@@ -64,7 +64,7 @@ def get_data():
         elif line.find("Avg") != -1:
           data = re.split(r"[ ]+", line.strip(" \n"))
           # print(data)
-          all_data[1] = data[5]
+          all_data[1] = str(float(data[5]) * 8)
         line = rf.readline()
       # print(all_data)
       print("|" + "|".join(all_data[:7]), file = f)
@@ -82,7 +82,7 @@ def data_run():
   run_test(data_path)
 
 if __name__ == "__main__":
-  for i in range (1, 5):
-    data_run()
-    time.sleep(300)
+  #for i in range (1, 5):
+   # data_run()
+    #time.sleep(300)
   get_data()
