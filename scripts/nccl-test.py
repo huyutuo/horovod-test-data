@@ -5,11 +5,13 @@ import sys
 import time
 import re
 
-init_command = "mpirun -np 4 -H localhost:1,172.26.89.160:1,172.26.89.159:1,172.26.89.158:1 --allow-run-as-root  ./build/all_reduce_perf -g 1  -w 0 -c 0"
+mpi_command = "mpirun -np 4 -H localhost:1,172.26.89.160:1,172.26.89.159:1,172.26.89.158:1 --allow-run-as-root "
+nccl_command = " ./build/all_reduce_perf -g 1  -w 0 -c 0 -n 3"
 init_file_path = "/root/nccl-tests/test-files/"
 working_dir = "/root/nccl-tests"
-
-def run_test(data_path):
+thread_socket = [[1,1], [1,2], [1,4], [2,1], [2,2], [2,4], [4,1], [4,2], [4,4]]
+thread_socket_default = [[1,1]]
+def run_test(data_path, init_command):
   os.chdir(working_dir)
   command = init_command + " -b 1M -e 1M "
   file_path = os.path.join(data_path, "1M")
@@ -56,10 +58,10 @@ def get_data():
       while line:
         if line[0] != '#':
           data = re.split(r"[ ]+", line.strip(" \n"))
-          all_data[2] = data[5]
-          all_data[3] = data[6]
-          all_data[4] = data[9]
-          all_data[5] = data[10]
+          all_data[2] = str(float(data[5]) * 8)
+          all_data[3] = str(float(data[6]) * 8)
+          all_data[4] = str(float(data[9]) * 8)
+          all_data[5] = str(float(data[10]) * 8)
           # print(data)
         elif line.find("Avg") != -1:
           data = re.split(r"[ ]+", line.strip(" \n"))
@@ -73,16 +75,75 @@ def get_data():
       
   f.close()
 
+def draw_pic():
+  data_paths = os.listdir(init_file_path)
+  print(data_paths)
+  data_paths.sort()
+  fig = plt.figure(figsize=(21, 21))
+  count = 1
+  for v in thread_socket:
+    sub_fig_name = "THREADS_" + str(v[0]) + "-"
+    sub_fig_name  += "SOCKETS_" + str(v[1])
+    x = [1]
+    for i in range(50, 1001, 50):
+      x.append(i)
+    y_default = []
+    y_ring = []
+    y_tree = []
+    for data_path in data_paths:
+      if data_path.find(sub_fig_name) != -1:
+        print(data_path)
+        tmp_data_path = data_path
+        data_path = os.path.join(init_file_path, data_path)
+        files = os.listdir(data_path)
+        files = sorted(files, key=file_cmp)
+
+        for file in files:
+          file = os.path.join(data_path, file)
+          rf = open(file)
+          line = rf.readline()
+          while line:
+            if line.find("Avg") != -1:
+              data = re.split(r"[ ]+", line.strip(" \n"))
+              if tmp_data_path.find("ring") != -1:
+                y_ring.append(float(data[5]) * 8)
+              elif tmp_data_path.find("tree") != -1:
+                y_tree.append(float(data[5]) * 8)
+              else:
+                y_default.append(float(data[5]) * 8)
+            line = rf.readline()
+    ax1 = fig.add_subplot(3, 3, count)
+    ax1.set_title(sub_fig_name)
+    plt.xlabel(u'data size/M')
+    plt.ylabel(u'speed/Gbps')
+    ax1.plot(x, y_default)
+    ax1.plot(x, y_ring)
+    ax1.plot(x, y_tree)
+    ax1.legend(['default', 'ring', 'tree'], loc='lower right')
+    count += 1
+          
+    plt.savefig("all.png")
+  
+      
+
 def data_run():
   data_path_name_str = time.strftime("%m-%d-%H-%M", time.localtime())
-  data_path = os.path.join(init_file_path, data_path_name_str)
-  if not os.path.exists(data_path):
-    os.makedirs(data_path)
-  print(data_path)
-  run_test(data_path)
+  for v in thread_socket:
+    data_path = os.path.join(init_file_path, data_path_name_str)
+    data_path += "_THREADS_" + str(v[0]) + "-"
+    data_path += "SOCKETS_" + str(v[1])
+    data_path += "_ring"
+    if not os.path.exists(data_path):
+      os.makedirs(data_path)
+    print(data_path)
+
+    init_command = mpi_command + " -x NCCL_SOCKET_NTHREADS=" + str(v[0])
+    init_command += " -x NCCL_NSOCKS_PERTHREAD=" + str(v[1])
+    init_command += " -x NCCL_TREE_THRESHOLD=Ring "
+    init_command += nccl_command
+    run_test(data_path, init_command)
 
 if __name__ == "__main__":
-  #for i in range (1, 5):
-   # data_run()
-    #time.sleep(300)
-  get_data()
+  #data_run()
+  #get_data()
+  draw_pic()
