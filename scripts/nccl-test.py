@@ -125,6 +125,60 @@ def draw_pic():
     plt.savefig("all.png")
   
       
+def get_excel():
+  f = open("/root/hyt/horovod-test-data/scripts/excel-data.txt", 'wt')
+  data_paths = os.listdir(init_file_path)
+  print(data_paths)
+  data_paths.sort()
+
+  speed = [[] for j in range(3)]
+  for data_path in data_paths:
+    if data_path.find("THREADS_") != -1:
+      print(data_path)
+      tmp_data_path = data_path
+      data_path = os.path.join(init_file_path, data_path)
+      files = os.listdir(data_path)
+      files = sorted(files, key=file_cmp)
+
+      tmp = []
+      for file in files:
+        file = os.path.join(data_path, file)
+        print(file)
+        rf = open(file)
+        line = rf.readline()
+        while line:
+          if line.find("Avg") != -1:
+            data = re.split(r"[ ]+", line.strip(" \n"))
+            tmp.append(float(data[5]) * 8)
+          line = rf.readline()
+
+      tmp_dict = {}
+      tmp_dict[tmp_data_path] = tmp
+      if tmp_data_path.find("ring") != -1:
+        speed[0].append(tmp)
+      elif tmp_data_path.find("tree") != -1:
+        speed[1].append(tmp)
+      else:
+        speed[2].append(tmp)
+
+  print("ring\n", file = f)
+  for i in range(len(speed[0][0])):
+    for v in speed[0]:
+      print(v[i], ",", end='',file = f)
+    print("\n", file = f)
+  
+  print("tree\n", file = f)
+  for i in range(len(speed[0][0])):
+    for v in speed[1]:
+      print(v[i], ",", end='',file = f)
+    print("\n", file = f)
+  
+  print("default\n", file = f)
+  for i in range(len(speed[0][0])):
+    for v in speed[2]:
+      print(v[i], ",", end='',file = f)
+    print("\n", file = f)
+
 
 def data_run():
   data_path_name_str = time.strftime("%m-%d-%H-%M", time.localtime())
@@ -146,4 +200,5 @@ def data_run():
 if __name__ == "__main__":
   #data_run()
   #get_data()
-  draw_pic()
+  #draw_pic()
+  get_excel()
