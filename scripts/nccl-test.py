@@ -43,11 +43,14 @@ def file_cmp(x):
   return int(x[:-1])
 
 def get_data():
+  def cmp(tmp_path):
+    return tmp_path.split("_")[-1]
   f = open("/root/hyt/horovod-test-data/scripts/nccl_test.txt", 'wt')
 
   data_paths = os.listdir(init_file_path)
   print(data_paths)
   data_paths.sort()
+  data_paths.sort(key=cmp)
   for data_path in data_paths:
     print(data_path)
     print(data_path, "\n", file = f)
