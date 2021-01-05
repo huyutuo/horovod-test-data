@@ -20,7 +20,16 @@ def run_test(data_path, init_command):
   os.system(command)
   print("1M test over")
 
-  for i in range(50, 1001, 50):
+  for i in range(10, 101, 10):
+    i_str = str(i)
+    command = init_command + " -b " + i_str + "M -e " + i_str + "M"
+    file_path = os.path.join(data_path, i_str + "M")
+    command = command + " > " + file_path
+    print(command)
+    os.system(command)
+    print(i, "M test over")
+  
+  for i in range(150, 1001, 50):
     i_str = str(i)
     command = init_command + " -b " + i_str + "M -e " + i_str + "M"
     file_path = os.path.join(data_path, i_str + "M")
@@ -34,15 +43,15 @@ def file_cmp(x):
   return int(x[:-1])
 
 def get_data():
-  f = open("/root/hyt/horovod-test-data/scripts/nccl_test.md", 'wt')
+  f = open("/root/hyt/horovod-test-data/scripts/nccl_test.txt", 'wt')
 
   data_paths = os.listdir(init_file_path)
   print(data_paths)
   data_paths.sort()
   for data_path in data_paths:
     print(data_path)
-    print("##", data_path, "\n", file = f)
-    print("|大小/MB|速率/Gbps|o-algbw|o-busbw|i-algbw|i-busbw|\n|---|---|---|---|---|---|", file = f)
+    print(data_path, "\n", file = f)
+    print("data-size, o-busbw, i-busbw", file = f)
     data_path = os.path.join(init_file_path, data_path)
     files = os.listdir(data_path)
     files = sorted(files, key=file_cmp)
@@ -69,7 +78,7 @@ def get_data():
           all_data[1] = str(float(data[5]) * 8)
         line = rf.readline()
       # print(all_data)
-      print("|" + "|".join(all_data[:7]), file = f)
+      print(all_data[0], all_data[3], all_data[5], file = f)
       rf.close()
     print("\n\n\n\n", file = f)
       
@@ -165,40 +174,45 @@ def get_excel():
   for i in range(len(speed[0][0])):
     for v in speed[0]:
       print(v[i], ",", end='',file = f)
-    print("\n", file = f)
+    print("", file = f)
   
   print("tree\n", file = f)
   for i in range(len(speed[0][0])):
     for v in speed[1]:
       print(v[i], ",", end='',file = f)
-    print("\n", file = f)
+    print("", file = f)
   
   print("default\n", file = f)
   for i in range(len(speed[0][0])):
     for v in speed[2]:
       print(v[i], ",", end='',file = f)
-    print("\n", file = f)
+    print("", file = f)
 
 
 def data_run():
-  data_path_name_str = time.strftime("%m-%d-%H-%M", time.localtime())
-  for v in thread_socket:
-    data_path = os.path.join(init_file_path, data_path_name_str)
-    data_path += "_THREADS_" + str(v[0]) + "-"
-    data_path += "SOCKETS_" + str(v[1])
-    data_path += "_ring"
-    if not os.path.exists(data_path):
-      os.makedirs(data_path)
-    print(data_path)
 
-    init_command = mpi_command + " -x NCCL_SOCKET_NTHREADS=" + str(v[0])
-    init_command += " -x NCCL_NSOCKS_PERTHREAD=" + str(v[1])
-    init_command += " -x NCCL_TREE_THRESHOLD=Ring "
-    init_command += nccl_command
-    run_test(data_path, init_command)
+  
+  data_path_name_str = time.strftime("%m-%d-%H-%M", time.localtime())
+  #kinds = {"_ring":" -x NCCL_ALGO=Ring ", "_tree":" -x NCCL_ALGO=Tree"}
+  kinds = {"_default": " ", "_ring":" -x NCCL_ALGO=Ring ", "_tree":" -x NCCL_ALGO=Tree", "_collnet" : " -x NCCL_ALGO=Collnet"}
+  for kind in kinds:
+    for v in thread_socket:
+      data_path = os.path.join(init_file_path, data_path_name_str)
+      data_path += "_THREADS_" + str(v[0]) + "-"
+      data_path += "SOCKETS_" + str(v[1])
+      data_path += kind
+      if not os.path.exists(data_path):
+        os.makedirs(data_path)
+      print(data_path)
+
+      init_command = mpi_command + " -x NCCL_SOCKET_NTHREADS=" + str(v[0])
+      init_command += " -x NCCL_NSOCKS_PERTHREAD=" + str(v[1])
+      init_command += kinds[kind]
+      init_command += nccl_command
+      run_test(data_path, init_command)
 
 if __name__ == "__main__":
-  #data_run()
-  #get_data()
+  data_run()
+  get_data()
   #draw_pic()
-  get_excel()
+  #get_excel()
