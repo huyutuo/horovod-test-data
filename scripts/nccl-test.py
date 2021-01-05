@@ -46,15 +46,25 @@ def get_data():
   def cmp(tmp_path):
     return tmp_path.split("_")[-1]
   f = open("/root/hyt/horovod-test-data/scripts/nccl_test.txt", 'wt')
+  kinds = [ "collnet", "default", "ring", "tree",]
+
+  print("data-size,", end = "", file = f)
+  for kind in kinds:
+    for v  in thread_socket:
+      tsstr = kind + "-T" + str(v[0]) + "-S" + str(v[1]) + '-'
+      print(tsstr + "o-busbw, " + tsstr + "i-busbw, ", end = "", file = f)
+  print("", file = f)
 
   data_paths = os.listdir(init_file_path)
   print(data_paths)
   data_paths.sort()
   data_paths.sort(key=cmp)
+
+  data_excel = {}
   for data_path in data_paths:
     print(data_path)
-    print(data_path, "\n", file = f)
-    print("data-size, o-busbw, i-busbw", file = f)
+    #print(data_path, "\n", file = f)
+
     data_path = os.path.join(init_file_path, data_path)
     files = os.listdir(data_path)
     files = sorted(files, key=file_cmp)
@@ -81,10 +91,20 @@ def get_data():
           all_data[1] = str(float(data[5]) * 8)
         line = rf.readline()
       # print(all_data)
-      print(all_data[0], all_data[3], all_data[5], file = f)
+      if all_data[0] in data_excel:
+        data_excel[all_data[0]].append(all_data[3])
+        data_excel[all_data[0]].append(all_data[5])
+      else:
+        data_excel[all_data[0]] = []
+        data_excel[all_data[0]].append(all_data[3])
+        data_excel[all_data[0]].append(all_data[5])
+      #print(all_data[0], all_data[3], all_data[5], file = f)
       rf.close()
-    print("\n\n\n\n", file = f)
-      
+  
+    #print("\n\n\n\n", file = f)
+  print(data_excel)
+  for data in data_excel:
+    print(data, ",".join(data_excel[data]), file = f)
   f.close()
 
 def draw_pic():
