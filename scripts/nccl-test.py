@@ -5,7 +5,7 @@ import sys
 import time
 import re
 
-mpi_command = "mpirun -np 4 -H localhost:1,172.26.89.160:1,172.26.89.159:1,172.26.89.158:1 --allow-run-as-root "
+mpi_command = "mpirun -np 16 -H localhost:4,172.26.89.160:4,172.26.89.159:4,172.26.89.158:4 --allow-run-as-root "
 nccl_command = " ./build/all_reduce_perf -g 1  -w 0 -c 0 -n 3"
 init_file_path = "/root/nccl-tests/test-files/"
 working_dir = "/root/nccl-tests"
@@ -46,13 +46,13 @@ def get_data():
   def cmp(tmp_path):
     return tmp_path.split("_")[-1]
   f = open("/root/hyt/horovod-test-data/scripts/nccl_test.txt", 'wt')
-  kinds = [ "collnet", "default", "ring", "tree",]
+  kinds = ["D", "R", "T",]
 
   print("data-size,", end = "", file = f)
   for kind in kinds:
     for v  in thread_socket:
       tsstr = kind + "-T" + str(v[0]) + "-S" + str(v[1]) + '-'
-      print(tsstr + "o-busbw, " + tsstr + "i-busbw, ", end = "", file = f)
+      print(tsstr + "o, " + tsstr + "i, ", end = "", file = f)
   print("", file = f)
 
   data_paths = os.listdir(init_file_path)
@@ -217,7 +217,7 @@ def data_run():
   
   data_path_name_str = time.strftime("%m-%d-%H-%M", time.localtime())
   #kinds = {"_ring":" -x NCCL_ALGO=Ring ", "_tree":" -x NCCL_ALGO=Tree"}
-  kinds = {"_default": " ", "_ring":" -x NCCL_ALGO=Ring ", "_tree":" -x NCCL_ALGO=Tree", "_collnet" : " -x NCCL_ALGO=Collnet"}
+  kinds = {"_default": " ", "_ring":" -x NCCL_ALGO=Ring ", "_tree":" -x NCCL_ALGO=Tree"}
   for kind in kinds:
     for v in thread_socket:
       data_path = os.path.join(init_file_path, data_path_name_str)
