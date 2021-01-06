@@ -6,7 +6,7 @@ import time
 import re
 
 mpi_command = "mpirun -np 16 -H localhost:4,172.26.89.160:4,172.26.89.159:4,172.26.89.158:4 --allow-run-as-root "
-nccl_command = " ./build/all_reduce_perf -g 1  -w 0 -c 0 -n 3"
+nccl_command = " ./build/all_reduce_perf -g 1  -w 0 -c 0 -n 10"
 init_file_path = "/root/nccl-tests/test-files/"
 working_dir = "/root/nccl-tests"
 thread_socket = [[1,1], [1,2], [1,4], [2,1], [2,2], [2,4], [4,1], [4,2], [4,4]]
