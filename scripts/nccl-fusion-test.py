@@ -135,6 +135,7 @@ def get_time_file():
       for algo in algos:
         for v in thread_socket:
           print("T" + str(v[0]) + "-S" + str(v[1]) + "-" + algo, end=",", file = f)
+          print("", file = f)
     print(kind, ",".join(data_excel[kind]), file = f)
   
   print(data_excel)
