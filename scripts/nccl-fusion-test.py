@@ -107,9 +107,41 @@ def get_data():
     print(data, ",".join(data_excel[data]), file = f)
   f.close()
 
-def data_run():
-
+def get_time_file():
+  rf = open("/root/hyt/horovod-test-data/scripts/fusion-test-n1.txt")
+  f = open("/root/hyt/horovod-test-data/scripts/fusion-test-excel.txt", "wt")
+  algos = ["D", "R", "T"]
   
+  
+  data_excel = {}
+
+  line = rf.readline()
+  while line:
+    kind = line.split(":")[0].strip(" ").split("/")[-1]
+    if kind not in data_excel:
+      data_excel[kind] = []
+    data_excel[kind].append(line.split(":")[1].strip(" \n"))
+    line = rf.readline()
+  
+  tmp_str = "0M"
+  
+
+  for kind in data_excel:
+    now_str = kind.split("-")[0]
+    if now_str != tmp_str:
+      tmp_str = now_str
+      print("\n\n", file = f)
+      print("data-size", end = ",", file = f)
+      for algo in algos:
+        for v in thread_socket:
+          print("T" + str(v[0]) + "-S" + str(v[1]) + "-" + algo, end=",", file = f)
+    print(kind, ",".join(data_excel[kind]), file = f)
+  
+  print(data_excel)
+
+
+
+def data_run():
   data_path_name_str = time.strftime("%m-%d-%H-%M", time.localtime())
   kinds = {"_default": " ", "_ring":" -x NCCL_ALGO=Ring ", "_tree":" -x NCCL_ALGO=Tree"}
   for kind in kinds:
@@ -130,7 +162,8 @@ def data_run():
 
 
 if __name__ == "__main__":
-  data_run()
+  get_time_file()
+  #data_run()
   #get_data()
   #draw_pic()
   #get_excel()
