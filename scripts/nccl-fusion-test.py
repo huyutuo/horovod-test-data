@@ -14,12 +14,12 @@ working_dir = "/root/nccl-tests"
 thread_socket = [[1,1], [1,2], [1,4], [2,1], [2,2], [2,4], [4,1], [4,2], [4,4]]
 thread_socket_default = [[1,1]]
 small_data = [1, 10, 20, 50, 100]
-fusion_file = open("/root/hyt/horovod-test-data/scripts/fusion-test.txt", 'wt')
+fusion_file = open("/root/hyt/horovod-test-data/scripts/fusion-test-10n", 'wt')
 def run_test(data_path, init_command):
   os.chdir(working_dir)
   for i in range(100, 1001, 100):
     for num in small_data:
-      command  = init_command + " -n " + str(i/num)
+      command  = init_command + " -n " + str(int(10 * i/num))
       command = command + " -b " + str(num) + "M -e " + str(num) + "M "
       file_path = os.path.join(data_path, str(i) + "M-" + str(i/num) + "*" + str(num) + "M")
       command = command + " > " + file_path
@@ -27,9 +27,9 @@ def run_test(data_path, init_command):
       start_time = datetime.datetime.now()
       os.system(command)
       end_time = datetime.datetime.now()
-      print(file_path, " : ", (start_time - end_time).microseconds, file = fusion_file)
+      print(file_path, " : ", (end_time - start_time).total_seconds(), file = fusion_file)
       print(str(i) + "M-" + str(i/num) + "*" + str(num) + "M test over")
-    command  = init_command + " -n 1 "
+    command  = init_command + " -n 10 "
     command = command + " -b " + str(i) + "M -e " + str(i) + "M"
     file_path = os.path.join(data_path, str(i) + "M")
     command = command + " > " + file_path
@@ -37,7 +37,7 @@ def run_test(data_path, init_command):
     start_time = datetime.datetime.now()
     os.system(command)
     end_time = datetime.datetime.now()
-    print(file_path, " : ", (start_time - end_time).microseconds, file = fusion_file)
+    print(file_path, " : ", (end_time - start_time).total_seconds(), file = fusion_file)
 
 def file_cmp(x):
   return int(x[:-1])
@@ -108,9 +108,9 @@ def get_data():
   f.close()
 
 def get_time_file():
-  rf = open("/root/hyt/horovod-test-data/scripts/fusion-test-n1.txt")
-  f = open("/root/hyt/horovod-test-data/scripts/fusion-test-excel.txt", "wt")
-  algos = ["D", "R", "T"]
+  rf = open("/root/hyt/horovod-test-data/scripts/fusion-test-10n.txt")
+  f = open("/root/hyt/horovod-test-data/scripts/fusion-test-excel-10n.txt", "wt")
+  algos = ["D"]
   
   
   data_excel = {}
@@ -144,7 +144,7 @@ def get_time_file():
 
 def data_run():
   data_path_name_str = time.strftime("%m-%d-%H-%M", time.localtime())
-  kinds = {"_default": " ", "_ring":" -x NCCL_ALGO=Ring ", "_tree":" -x NCCL_ALGO=Tree"}
+  kinds = {"_default": " "}
   for kind in kinds:
     for v in thread_socket:
       data_path = os.path.join(init_file_path, data_path_name_str)
@@ -163,8 +163,8 @@ def data_run():
 
 
 if __name__ == "__main__":
-  get_time_file()
   #data_run()
+  get_time_file()
   #get_data()
   #draw_pic()
   #get_excel()
