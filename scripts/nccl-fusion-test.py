@@ -120,7 +120,7 @@ def get_time_file():
     kind = line.split(":")[0].strip(" ").split("/")[-1]
     if kind not in data_excel:
       data_excel[kind] = []
-    data_excel[kind].append(line.split(":")[1].strip(" \n"))
+    data_excel[kind].append(str('%.2f' % (float(line.split(":")[1].strip(" \n")) * 100))) # 转换为ms  /10 * 1000
     line = rf.readline()
   
   tmp_str = "0M"
