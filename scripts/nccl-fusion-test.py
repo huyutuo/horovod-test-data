@@ -8,36 +8,51 @@ import datetime
 
 # 判断小的数据量在合并成大的数据量之后，速度的变化，以及运行时间的比较
 mpi_command = "mpirun -np 4 -H localhost:1,172.26.89.160:1,172.26.89.159:1,172.26.89.158:1 --allow-run-as-root "
-nccl_command = " ./build/all_reduce_perf -g 1  -w 0 -c 0 "
+nccl_command = " ./build/all_reduce_perf -g 1  -w 0 -c 0 -n 1"
 init_file_path = "/root/nccl-tests/test-files/"
 working_dir = "/root/nccl-tests"
 thread_socket = [[1,1], [1,2], [1,4], [2,1], [2,2], [2,4], [4,1], [4,2], [4,4]]
 thread_socket_default = [[1,1]]
 small_data = [1, 10, 20, 50, 100]
-fusion_file = open("/root/hyt/horovod-test-data/scripts/fusion-test-10n", 'wt')
+fusion_file = open("/root/hyt/horovod-test-data/scripts/fusion-time.txt", 'wt')
 def run_test(data_path, init_command):
   os.chdir(working_dir)
-  for i in range(100, 1001, 100):
-    for num in small_data:
-      command  = init_command + " -n " + str(int(10 * i/num))
-      command = command + " -b " + str(num) + "M -e " + str(num) + "M "
-      file_path = os.path.join(data_path, str(i) + "M-" + str(i/num) + "*" + str(num) + "M")
-      command = command + " > " + file_path
-      print(command)
-      start_time = datetime.datetime.now()
-      os.system(command)
-      end_time = datetime.datetime.now()
-      print(file_path, " : ", (end_time - start_time).total_seconds(), file = fusion_file)
-      print(str(i) + "M-" + str(i/num) + "*" + str(num) + "M test over")
-    command  = init_command + " -n 10 "
-    command = command + " -b " + str(i) + "M -e " + str(i) + "M"
-    file_path = os.path.join(data_path, str(i) + "M")
-    command = command + " > " + file_path
+  command = init_command + " -b 1M -e 1M"
+
+  start_time = datetime.datetime.now()
+  for j in range(10):
+    os.system(command)
+  end_time = datetime.datetime.now()
+  print(data_path + "-1M" , " : ", (end_time - start_time).total_seconds()/10, file = fusion_file)
+
+  for i in range(10, 101, 10):
+    command = init_command + " -b " + str(i) + "M -e " + str(i) + "M "
     print(command)
     start_time = datetime.datetime.now()
-    os.system(command)
+    for j in range(10):
+      #file_path = os.path.join(data_path, str(i) + "M-" + str(i/num) + "*" + str(num) + "M")
+      #command = command + " > " + file_path
+      #print(command)
+      os.system(command)
     end_time = datetime.datetime.now()
-    print(file_path, " : ", (end_time - start_time).total_seconds(), file = fusion_file)
+    print(data_path + "-"  + str(i) + "M", " : ", (end_time - start_time).total_seconds()/10, file = fusion_file)
+    print(str(i) + "M test over")
+  
+  for i in range(100, 1001, 100):
+    command = init_command + " -b " + str(i) + "M -e " + str(i) + "M "
+    print(command)
+    start_time = datetime.datetime.now()
+    for j in range(10):
+      #file_path = os.path.join(data_path, str(i) + "M-" + str(i/num) + "*" + str(num) + "M")
+      #command = command + " > " + file_path
+      #print(command)
+      os.system(command)
+    end_time = datetime.datetime.now()
+    print(data_path + "-"  + str(i) + "M", " : ", (end_time - start_time).total_seconds()/10, file = fusion_file)
+    print(str(i) + "M test over")
+
+
+
 
 def file_cmp(x):
   return int(x[:-1])
@@ -163,8 +178,8 @@ def data_run():
 
 
 if __name__ == "__main__":
-  #data_run()
-  get_time_file()
+  data_run()
+  #get_time_file()
   #get_data()
   #draw_pic()
   #get_excel()
