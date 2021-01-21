@@ -1,0 +1,89 @@
+当前时间戳_1=1611196332129
+main 入口-时间戳 : 1611196332500  380ms
+testResult_t-时间戳 : 1611196332539 40ms
+MPI_Allgather MPI_IN_PLACE start-时间戳 : 1611196332539
+MPI_Allgather MPI_IN_PLACE end-时间戳 : 1611196332550 40ms
+# nThread 1 nGpus 1 minBytes 1048576000 maxBytes 1048576000 step: 1048576(bytes) warmup iters: 0 iters: 1 validation: 0 
+#
+# Using devices
+nThreads: 1, nGpus: 1
+MPI_Gather line start-时间戳 : 1611196332772  200ms
+MPI_Gather line end-时间戳 : 1611196332772
+#   Rank  0 Pid   5068 on horovod-4gpu-test001 device  0 [0x00] Tesla V100-SXM2-32GB
+#   Rank  1 Pid   1838 on horovod-4gpu-test003 device  0 [0x00] Tesla V100-SXM2-32GB
+#   Rank  2 Pid   1773 on horovod-4gpu-test004 device  0 [0x00] Tesla V100-SXM2-32GB
+#   Rank  3 Pid   1810 on horovod-4gpu-test002 device  0 [0x00] Tesla V100-SXM2-32GB
+MPI_Bcast ncclId start-时间戳 : 1611196332774
+MPI_Bcast ncclId end-时间戳 : 1611196332774
+AllocateBuffs start-时间戳 : 1611196332774
+AllocateBuffs end-时间戳 : 1611196332910  130ms
+init nccl start-时间戳 : 1611196332910
+init nccl end-时间戳 : 1611196333161    250ms
+#
+#                                                     out-of-place                       in-place          
+#       size         count    type   redop     time   algbw   busbw  error     time   algbw   busbw  error
+#        (B)    (elements)                     (us)  (GB/s)  (GB/s)            (us)  (GB/s)  (GB/s)       
+thread run start-时间戳 : 1611196333163
+run threadRunTests
+  1048576000     262144000   float     sumdeltaSec_1: 0.794168
+deltaSec_2: 0.794168
+   794168    1.32    1.98    N/AdeltaSec_1: 0.791020
+deltaSec_2: 0.791020
+   791020    1.33    1.99    N/A
+thread run end-时间戳 : 1611196336329 3200ms   1600ms
+MPI_ALLreduce errors start-时间戳 : 1611196336329
+MPI_ALLreduce errors end-时间戳 : 1611196336329
+Free CUDA memory start-时间戳 : 1611196336340
+Free CUDA memory end-时间戳 : 1611196336345
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 1.98446 
+#
+end-work start-时间戳 : 1611196336345  
+end-work end-时间戳 : 1611196336459 100ms
+当前时间戳_2=1611196336586    4460m
+
+
+
+main 入口-时间戳 : 1611196336953 370ms
+MPI_SUPPORT
+testResult_t-时间戳 : 1611196336993 40ms
+MPI_Allgather MPI_IN_PLACE start-时间戳 : 1611196336993
+MPI_Allgather MPI_IN_PLACE end-时间戳 : 1611196337004   10ms
+# nThread 1 nGpus 1 minBytes 1048576 maxBytes 1048576 step: 1048576(bytes) warmup iters: 0 iters: 1 validation: 0 
+#
+# Using devices
+nThreads: 1, nGpus: 1
+MPI_Gather line start-时间戳 : 1611196337223  220ms
+MPI_Gather line end-时间戳 : 1611196337223
+#   Rank  0 Pid   5106 on horovod-4gpu-test001 device  0 [0x00] Tesla V100-SXM2-32GB
+#   Rank  1 Pid   1918 on horovod-4gpu-test003 device  0 [0x00] Tesla V100-SXM2-32GB
+#   Rank  2 Pid   1852 on horovod-4gpu-test004 device  0 [0x00] Tesla V100-SXM2-32GB
+#   Rank  3 Pid   1890 on horovod-4gpu-test002 device  0 [0x00] Tesla V100-SXM2-32GB
+MPI_Bcast ncclId start-时间戳 : 1611196337225
+MPI_Bcast ncclId end-时间戳 : 1611196337225
+AllocateBuffs start-时间戳 : 1611196337225
+AllocateBuffs end-时间戳 : 1611196337351  130ms 
+init nccl start-时间戳 : 1611196337351
+init nccl end-时间戳 : 1611196337598  250ms
+#
+#                                                     out-of-place                       in-place          
+#       size         count    type   redop     time   algbw   busbw  error     time   algbw   busbw  error
+#        (B)    (elements)                     (us)  (GB/s)  (GB/s)            (us)  (GB/s)  (GB/s)       
+thread run start-时间戳 : 1611196337599
+run threadRunTests
+     1048576        262144   float     sumdeltaSec_1: 0.001749
+deltaSec_2: 0.001749
+   1748.5    0.60    0.90    N/AdeltaSec_1: 0.001558
+deltaSec_2: 0.001558
+   1558.5    0.67    1.01    N/A
+thread run end-时间戳 : 1611196337608  10ms
+MPI_ALLreduce errors start-时间戳 : 1611196337608
+MPI_ALLreduce errors end-时间戳 : 1611196337609
+Free CUDA memory start-时间戳 : 1611196337619
+Free CUDA memory end-时间戳 : 1611196337620
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 0.954393 
+#
+end-work start-时间戳 : 1611196337620
+end-work end-时间戳 : 1611196337732  110ms
+当前时间戳_3=1611196337857  1300ms
