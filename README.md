@@ -46,46 +46,65 @@
 这里简要说明各个文件的内容，对于测试数据，在单个的文件中有环境以及数据的详细说明。
 ### scripts
 - install-horovod.sh
+
 修改horovod源码之后，方便安装horovod的脚本
 
 - get_avg.py
+
 解析在horovod测试输出的log信息，获取训练中传输的数据大小以及传输时间，传输速度等信息
 
 - nccl-test.py
+
 分不同的参数，不同的数据大小，执行多次nccl allreduce测试，获取传输速度
 
 - nccl-fusion-test.py
+
 测试传输相同的数据大小，分不同的小数据传输的时间差距。例如传输1000M的数据，1次传输1000M与1000次传输1M的时间差距
 
 - time-fusion-test.py
+
 测试传输不同的数据大小所花费的时间
 
 ### horovod-test-data
 - resnet和vgg测试数据.md
+
 存放了在2020-11-03 与 2020-11-04 horovod测试的数据，主要是训练中每个步骤所花费的时间以及训练时的传输速度
 - all-message.md
+
 存放了2020-12中horovod测试的数据，数据为训练中传输不同大小数据的数量以及传输速度
 - autotune 测试结果.md
+
 数据为不使用autotune，使用aututune以及使用autotune得到的最优参数进行训练的区别
 - autotune 最优参数.md
+
 数据为使用autotune与不使用autotune进行训练的区别，其中包含了使用autotune得到的最优参数
 
 ### nccl-test-data
 - 不同数据大小传输时间.xlsx
+
 测试nccl 在传输不同大小的数据时所花费的时间，其中 -n 参数为1，即每次都要通过mpirun命令来进行测试
 - nccl-16个GPU-传输速率.xlsx
+
 nccl在4*4块GPU上传输的速率
 - nccl不同数据大小i-o速率_i.xlsx
+
 nccl在传输不同数据大小时的速率
 - nccl—test各阶段耗时_i.txt
+
 nccl-test中有多个阶段，包括从运行mpirun至到test main函数，以及获取内存等阶段，文件中记录了在测试中的原始数据
 
 
 # 默认测试参数
 如无特殊说明，默认的测试参数为：
-TODO
+测试集群: 上文中提到的阿里云集群
+硬件: ecs.gn6e-c12g1.12xlarge 的配置
+
 ## horovod测试默认参数
 如测试文件夹内无特殊说明，则默认训练的epoch为10，batch为10，batch_size为32
+
+## nccl-test 默认参数
+ -g 1  -w 0 -c 0
+
 
 
 
