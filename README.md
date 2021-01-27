@@ -66,6 +66,10 @@
 
 测试传输不同的数据大小所花费的时间
 
+- vgg16-dis-train.py resnet50-dis-train.py
+
+用来进行分布式训练的训练代码
+
 ### horovod-test-data
 - resnet和vgg测试数据.md
 
