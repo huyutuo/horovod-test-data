@@ -20,7 +20,7 @@ workers将message_queue中的request 进行判断，判断是否命中cache，�
 1. 如果tensor_name_to_bit_ 找不到message中的tensor_name ，则为MISS
 2. 如果tensor_name_to_bit_ 中包含message中的tensor_name，并且response参数与TensorParams中的参数都相同，则为HIT
 3. 如果tensor_name_to_bit_ 中包含message中的tensor_name，但参数不同，则为INVALID
-![流程图 -5-](media/16151858899167/流程图 -5-.jpg)
+![流程图 -5-](media/16151858899167/命中cache.jpg)
 
 ## 同步worker间的cache状态
 因为worker间拥有相同的response cache， 所以可以采用位来映射一个response，减少协调时的数据传输。
@@ -31,7 +31,7 @@ workers将message_queue中的request 进行判断，判断是否命中cache，�
 最后 worker上的response cache会删除invalid bit所对应的cache
  worker间会进行allreduce操作（利用bitvector），最终取得在所有workers上都命中cache的request， 以及所有worker中所有的无效的request。 这些信息最终存在在cache_coordinator中。然后每个worker会将无效的response cache去除。
 
-![流程图 -6-](media/16151858899167/流程图 -6-.jpg)
+![流程图 -6-](media/16151858899167/同步cacheCoordinator.jpg)
 
 
 ## 划分requset
