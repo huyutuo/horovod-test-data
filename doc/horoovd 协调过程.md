@@ -5,7 +5,8 @@
 # 协调过程目的
 协调过程的目的是决定workers处理哪些tensor，执行哪些操作。
 # Response cache
-每个worker中存在一个Response Cache，并且每个worker上的Response Cache 的内容是相同的.  Response Cache中存放了被其他rank 发送的tensor 对应的response(计算完成后，发送给coordinator), 如果Response Cache中包含了此轮所有的message， 则不需要额外的communications。
+每个worker中存在一个Response Cache，并且每个worker上的Response Cache 的内容是相同的，保存上一轮生成的response list。如果Response Cache中包含了此轮所有的message， 则不需要额外的communications。
+
 
 每个worker上cache以std::list<std::pair<Response, TensorParams>> 的形式记录，采用LRU cache.  并利用std::unordered_map<std::string, uint32_t> tensor_name_to_bit_  实现快速寻找cache中的元素
 
@@ -54,8 +55,8 @@ workers在每轮会将message中的request分为三个部分
 
 ### Coordinator:
 得到全部的协调完成的request
-  1. 首先处理coordinator中的T2部分，去判断这些tensor是否在所有rank上都已经准备好。
-  2. 然后去接受其他worker部分的T2，再去判断是否在所有rank上已经准备好
+  1. 首先处理coordinator中的R2部分，去判断这些tensor是否在所有rank上都已经准备好。
+  2. 然后去接受其他worker部分的R2，再去判断是否在所有rank上已经准备好
   3. 上面的两部分整合起来，则是此轮全部的所有节点都准备好的tensor，将这些tensor对应的request放入一个队列，记为ready_to_reduce。
 
 构建response list
