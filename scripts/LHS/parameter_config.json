@@ -1,0 +1,21 @@
+{
+  "layers" : 30,
+  "parameter" : [
+    {
+      "name" : "cycle-time",
+      "bounds" : [0, 10]
+    },
+    {
+      "name" : "fusion-buffer",
+      "bounds" : [0, 10]
+    },
+    {
+      "name" : "cache-capacity",
+      "bounds" : [0,50] 
+    },
+    {
+      "name" : "hierarchical-allreduce",
+      "bounds" : [0,1]
+    }
+  ]
+}
